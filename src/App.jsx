@@ -4,6 +4,8 @@ import DashboardLayout from "./Pages/Layouts/DashboardLayout";
 import Courses from "./Pages/Contents/Courses";
 import Login from "./Pages/Login";
 import ProtectedRoute from "./Hooks/ProtectedRoute";
+import Schedule from "./Pages/Contents/Schedule";
+import Registration from "./Pages/Contents/Registration";
 
 function App() {
   return (
@@ -24,6 +26,22 @@ function App() {
           element={
             <ProtectedRoute>
               <Courses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <Schedule />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/registration"
+          element={
+            <ProtectedRoute>
+              <Registration />
             </ProtectedRoute>
           }
         />

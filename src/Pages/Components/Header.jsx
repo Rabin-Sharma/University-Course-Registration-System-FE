@@ -1,12 +1,35 @@
 import React from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { request } from "../../Services/api";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const Header = () => {
   const navigate = useNavigate();
   const HandelLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  }
+    Swal.fire({
+      title: "Are you sure you want to logout?",
+      text: "You will be redirected to the login page.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        request("logout", "POST").then((res) => {
+          if (!res.ok) {
+            toast.error("Logout failed. Please try again.");
+            return;
+          }
+          toast.success("Logged out successfully");
+          localStorage.removeItem("token"); // or however you store auth
+          navigate("/login");
+        });
+      }
+    });
+  };
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

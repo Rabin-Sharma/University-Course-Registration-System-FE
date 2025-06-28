@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { request } from "../Services/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -9,17 +10,9 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log(JSON.stringify({ email, password }));
 
     try {
-      const res = await fetch("http://localhost:8000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
+      const res = await request("login", "POST", { email, password });
       const data = await res.json();
 
       if (res.ok && data.status === true) {
@@ -118,7 +111,7 @@ const Login = () => {
           </div>
 
           <button
-            type="button"
+            type="submit"
             onClick={handleLogin}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 transform hover:scale-105"
           >

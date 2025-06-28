@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CourseFilter from "./../Components/CourseFilter";
 import { FaRegUser } from "react-icons/fa";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
@@ -6,18 +6,31 @@ import { LuClock5 } from "react-icons/lu";
 import { IoSearch } from "react-icons/io5";
 
 const Courses = () => {
+  const [searchTerm, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [instructor, setInstructor] = useState("");
+
   return (
     <main className="flex-1 p-6">
       {/* <!-- Header --> */}
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Browse Courses</h2>
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          Browse Courses
+        </h2>
         <p className="text-gray-600">
           Find and register for courses for Spring 2024
         </p>
       </div>
 
       {/* <!-- Search and Filter Section --> */}
-      <CourseFilter />
+      <CourseFilter
+        setSearch={setSearch}
+        setCategory={setCategory}
+        setInstructor={setInstructor}
+        searchTerm={searchTerm}
+        category={category}
+        instructor={instructor}
+      />
 
       {/* <!-- Course Cards Grid --> */}
       <div
@@ -64,7 +77,9 @@ const Courses = () => {
       {/* <!-- No Results Message --> */}
       <div id="noResults" className="hidden text-center py-12">
         <IoSearch />
-        <h3 className="text-lg font-medium text-gray-700 mb-2">No courses found</h3>
+        <h3 className="text-lg font-medium text-gray-700 mb-2">
+          No courses found
+        </h3>
         <p className="text-gray-500">
           Try adjusting your search criteria or clear the filters.
         </p>

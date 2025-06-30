@@ -16,19 +16,16 @@ const CourseFilter = ({
     setInstructor("");
   };
   const [categories, setCategories] = useState([]);
+  const [instructors, setInstructors] = useState([]);
 
   const fetchCategory = async (e) => {
     try {
-      const res = await request("categories", "GET", {
-        searchTerm,
-        category,
-        instructor,
-      });
+      const res = await request("categories", "GET");
       const data = await res.json();
       console.log("Category data:", data);
       if (res.ok && data.status === true) {
         setCategories(data.categories);
-        toast.success(data.message);
+        // toast.success(data.message);
       } else if (data.status === false) {
         toast.error(data.message);
       } else {
@@ -39,10 +36,29 @@ const CourseFilter = ({
       console.error("Category fetch error:", error);
     }
   };
+  const fetchInstructor = async (e) => {
+    try {
+      const res = await request("instructors", "GET");
+      const data = await res.json();
+      console.log("Instructor data:", data);
+      if (res.ok && data.status === true) {
+        setInstructors(data.instructors);
+        // toast.success(data.message);
+      } else if (data.status === false) {
+        toast.error(data.message);
+      } else {
+        toast.error("Instructors could not be fetched. Please try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while fetching instructors.");
+      console.error("Instructor fetch error:", error);
+    }
+  };
 
   useEffect(() => {
     fetchCategory();
-  }, [searchTerm, category, instructor]);
+    fetchInstructor();
+  }, []);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
@@ -70,6 +86,7 @@ const CourseFilter = ({
           <select
             id="categoryFilter"
             onChange={(e) => setCategory(e.target.value)}
+            value={category}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Categories</option>
@@ -89,13 +106,15 @@ const CourseFilter = ({
           <select
             id="instructorFilter"
             onChange={(e) => setInstructor(e.target.value)}
+            value={instructor}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Instructors</option>
-            <option value="Dr. Smith">Dr. Smith</option>
-            <option value="Prof. Johnson">Prof. Johnson</option>
-            <option value="Dr. Williams">Dr. Williams</option>
-            <option value="Prof. Brown">Prof. Brown</option>
+            {instructors.map((instructor) => (
+              <option key={instructor.id} value={instructor.id}>
+                {instructor.name}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -1,14 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CourseFilter from "./../Components/CourseFilter";
-import { FaRegUser } from "react-icons/fa";
-import { HiOutlineOfficeBuilding } from "react-icons/hi";
-import { LuClock5 } from "react-icons/lu";
 import { IoSearch } from "react-icons/io5";
+import toast from "react-hot-toast";
+import { request } from "../../Services/api";
+import CourseCard from "../Components/CourseCard";
 
 const Courses = () => {
   const [searchTerm, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState("");
   const [instructor, setInstructor] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCourse = async (e) => {
+    try {
+      setLoading(true);
+      const res = await request("courses", "GET", {
+        search: searchTerm,
+        category,
+        instructor,
+      });
+      const data = await res.json();
+      console.log("Courses data:", data);
+      if (res.ok && data.status === true) {
+        setCourses(data.courses);
+        setLoading(false);
+        // toast.success(data.message);
+      } else if (data.status === false) {
+        toast.error(data.message);
+      } else {
+        toast.error("Courses could not be fetched. Please try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while fetching courses.");
+      console.error("Course fetch error:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourse();
+  }, [searchTerm, category, instructor]);
 
   return (
     <main className="flex-1 p-6">
@@ -37,41 +68,25 @@ const Courses = () => {
         id="courseGrid"
         className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
       >
-        {/* <!-- Course Card 1 --> */}
-        <div
-          className="course-card bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-          data-category="Computer Science"
-          data-instructor="Dr. Smith"
-        >
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800">CS 101</h3>
-              <p className="text-gray-600">Intro. to Programming</p>
-            </div>
-            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-              3 Credits
-            </span>
+        {loading ? (
+          <div className="col-span-full flex justify-center items-center py-12">
+            <div className="loader border-4 border-blue-500 border-t-transparent rounded-full w-12 h-12 animate-spin"></div>
           </div>
-
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center text-sm text-gray-600">
-              <FaRegUser className="w-4 h-4 mr-2" />
-              <span>Dr. Smith</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <HiOutlineOfficeBuilding className="w-4 h-4 mr-2" />
-              <span>Computer Science</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <LuClock5 className="w-4 h-4 mr-2" />
-              <span>Mon, Wed 10:00-11:30 AM</span>
-            </div>
+        ) : courses.length === 0 ? (
+          <div id="noResults" className="text-center py-12 col-span-full">
+            <IoSearch className="w-8 h-8 mx-auto text-gray-400" />
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              No courses found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your search criteria or clear the filters.
+            </p>
           </div>
-
-          <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
-            Register
-          </button>
-        </div>
+        ) : (
+          courses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))
+        )}
       </div>
 
       {/* <!-- No Results Message --> */}

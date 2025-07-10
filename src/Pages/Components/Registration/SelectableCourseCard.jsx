@@ -38,11 +38,6 @@ const SelectableCourseCard = ({
                 Full
               </span>
             )}
-            {course.status === 'waitlist' && (
-              <span className="inline-block px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded ml-2">
-                Waitlist
-              </span>
-            )}
             {course.status === 'enrolled' && !showSelectButton && (
               <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded ml-2">
                 Enrolled
@@ -88,7 +83,7 @@ const SelectableCourseCard = ({
               onClick={() => onSelectCourse(course.id)}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
             >
-              {isFull ? 'Join Waitlist' : 'Select'}
+              Select
             </button>
           )
         )}

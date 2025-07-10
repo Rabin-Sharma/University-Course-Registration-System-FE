@@ -5,7 +5,7 @@ import Courses from "./Pages/Contents/Courses";
 import Login from "./Pages/Login";
 import ProtectedRoute from "./Hooks/ProtectedRoute";
 import Schedule from "./Pages/Contents/Schedule";
-import Registration from "./Pages/Contents/Registration";
+import Registration from './Pages/Components/Registration/Registration';
 
 function App() {
   return (

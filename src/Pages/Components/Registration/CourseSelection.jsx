@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SelectableCourseCard from "./SelectableCourseCard";
+import CourseFilter from "../CourseFilter";
 
 const CourseSelection = ({
   availableCourses,
@@ -11,21 +12,18 @@ const CourseSelection = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [instructor, setInstructor] = useState("");
 
   const filteredCourses = availableCourses.filter((course) => {
     const matchesSearch =
       course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory =
-      !selectedCategory || course.category === selectedCategory;
+      !selectedCategory || course.categoryId == selectedCategory;
+    const matchesInstructor = !instructor || course.instructorId == instructor;
 
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesCategory && matchesInstructor;
   });
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setSelectedCategory("");
-  };
 
   return (
     <div>
@@ -35,39 +33,14 @@ const CourseSelection = ({
           Available Courses
         </h3>
 
-        {/* Search and Filter */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search courses..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Categories</option>
-              <option value="Computer Science">Computer Science</option>
-              <option value="Mathematics">Mathematics</option>
-              <option value="Physics">Physics</option>
-              <option value="Engineering">Engineering</option>
-            </select>
-          </div>
-          <div>
-            <button
-              onClick={clearFilters}
-              className="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition duration-200"
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
+        <CourseFilter
+          setSearch={setSearchTerm}
+          setCategory={setSelectedCategory}
+          setInstructor={setInstructor}
+          searchTerm={searchTerm}
+          category={selectedCategory}
+          instructor={instructor}
+        />
 
         {/* Available Courses List */}
         <div className="space-y-4">

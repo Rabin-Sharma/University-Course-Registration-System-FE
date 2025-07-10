@@ -1,17 +1,72 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { checkConflicts } from '../../../Services/api';
 
 const ReviewAndConflicts = ({ 
   selectedCourses, 
   conflicts, 
-  waitlistCourses, 
+  setConflicts,
   totalCredits, 
   onBack, 
   onNext 
 }) => {
+  const [isCheckingConflicts, setIsCheckingConflicts] = useState(false);
+  const [conflictError, setConflictError] = useState(null);
+
+  // Check conflicts when component mounts or selected courses change
+  useEffect(() => {
+    const checkForConflicts = async () => {
+      if (selectedCourses.length < 2) {
+        setConflicts([]);
+        return;
+      }
+
+      try {
+        setIsCheckingConflicts(true);
+        setConflictError(null);
+        
+        const courseIds = selectedCourses.map(course => course.id);
+        const conflictData = await checkConflicts(courseIds);
+        
+        setConflicts(conflictData.conflicts || []);
+      } catch (error) {
+        setConflictError('Failed to check conflicts. Please try again.');
+        console.error('Error checking conflicts:', error);
+      } finally {
+        setIsCheckingConflicts(false);
+      }
+    };
+
+    checkForConflicts();
+  }, [selectedCourses, setConflicts]);
   return (
     <div>
+      {/* Conflict Checking Loading */}
+      {isCheckingConflicts && (
+        <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-6">
+          <div className="flex items-center">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-3"></div>
+            <span className="text-blue-800">Checking for schedule conflicts...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Conflict Error */}
+      {conflictError && (
+        <div className="bg-red-50 border border-red-200 p-4 rounded-xl mb-6">
+          <div className="flex items-start">
+            <svg className="w-5 h-5 text-red-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 2h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+              <h3 className="text-sm font-medium text-red-800">Error Checking Conflicts</h3>
+              <p className="mt-1 text-sm text-red-700">{conflictError}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Conflict Detection */}
-      {conflicts.length > 0 && (
+      {conflicts.length > 0 && !isCheckingConflicts && (
         <div className="bg-red-50 border border-red-200 p-4 rounded-xl mb-6">
           <div className="flex items-start">
             <svg className="w-5 h-5 text-red-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,7 +77,8 @@ const ReviewAndConflicts = ({
               <div className="mt-2 text-sm text-red-700">
                 {conflicts.map((conflict, index) => (
                   <p key={index}>
-                    • {conflict.course1.code} conflicts with {conflict.course2.code} (schedule overlap)
+                    • {conflict.course1?.code || conflict.course1} conflicts with {conflict.course2?.code || conflict.course2} 
+                    {conflict.reason && ` (${conflict.reason})`}
                   </p>
                 ))}
               </div>
@@ -31,22 +87,16 @@ const ReviewAndConflicts = ({
         </div>
       )}
 
-      {/* Waitlist Options */}
-      {waitlistCourses.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-6">
+      {/* Success Message when no conflicts */}
+      {conflicts.length === 0 && !isCheckingConflicts && selectedCourses.length > 1 && (
+        <div className="bg-green-50 border border-green-200 p-4 rounded-xl mb-6">
           <div className="flex items-start">
-            <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <svg className="w-5 h-5 text-green-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <div>
-              <h3 className="text-sm font-medium text-yellow-800">Courses with Limited Availability</h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                {waitlistCourses.map((course, index) => (
-                  <p key={index}>
-                    • {course.code} - {course.name} (Position estimated: {Math.floor(Math.random() * 5) + 1})
-                  </p>
-                ))}
-              </div>
+              <h3 className="text-sm font-medium text-green-800">No Schedule Conflicts</h3>
+              <p className="mt-1 text-sm text-green-700">All selected courses are compatible.</p>
             </div>
           </div>
         </div>
@@ -63,9 +113,6 @@ const ReviewAndConflicts = ({
                 <div key={course.id} className="flex justify-between items-center">
                   <div>
                     <span className="font-medium">{course.code}</span> - {course.name}
-                    {course.status === 'waitlist' && (
-                      <span className="text-yellow-600 text-sm ml-2">(Waitlist)</span>
-                    )}
                   </div>
                   <span className="text-gray-600">{course.credits} credits</span>
                 </div>
@@ -79,9 +126,6 @@ const ReviewAndConflicts = ({
           {conflicts.length > 0 && (
             <p className="text-red-600 text-sm mt-2">⚠ Schedule conflicts detected above</p>
           )}
-          {waitlistCourses.length > 0 && (
-            <p className="text-yellow-600 text-sm mt-2">ℹ Some courses require waitlist enrollment</p>
-          )}
         </div>
       </div>
 
@@ -94,9 +138,10 @@ const ReviewAndConflicts = ({
         </button>
         <button 
           onClick={onNext}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+          disabled={isCheckingConflicts || conflicts.length > 0}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Next: Confirm Registration
+          {isCheckingConflicts ? 'Checking...' : 'Next: Confirm Registration'}
         </button>
       </div>
     </div>

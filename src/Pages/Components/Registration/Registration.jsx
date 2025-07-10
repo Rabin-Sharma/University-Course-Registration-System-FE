@@ -1,96 +1,89 @@
 import React, { useState, useEffect } from 'react';
-// import TopNavigation from './TopNavigation';
-import Sidebar from './Sidebar';
 import ProgressSteps from './ProgressSteps';
 import CreditLimit from './CreditLimit';
 import CourseSelection from './CourseSelection';
 import ReviewAndConflicts from './ReviewAndConflicts';
 import Confirmation from './Confirmation';
-import MobileNavigation from './MobileNavigation';
-import { coursesData } from '../data/coursesData';
+import MobileNavigation from './MobileNavigation'
+import { fetchCourses } from '../../../Services/api';
 
 const Registration = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCourses, setSelectedCourses] = useState([]);
+  const [availableCourses, setAvailableCourses] = useState([]);
   const [conflicts, setConflicts] = useState([]);
-  const [waitlistCourses, setWaitlistCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch courses on component mount
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        setLoading(true);
+        const coursesData = await fetchCourses();
+        
+        // Transform the backend data to match frontend expectations
+        const transformedCourses = coursesData.map(course => ({
+          id: course.id,
+          code: course.course_code,
+          name: course.name,
+          description: course.description,
+          credits: course.credits,
+          instructor: course.instructor.name,
+          instructorId: course.instructor.id,
+          category: course.category.name,
+          categoryId: course.category.id,
+          timeSlots: course.time_stamps.map(timeStamp => ({
+            day: timeStamp.day,
+            start: timeStamp.start_time,
+            end: timeStamp.end_time
+          })),
+          // Create a readable schedule string
+          schedule: course.time_stamps.map(ts => 
+            `${ts.day} ${ts.start_time}-${ts.end_time}`
+          ).join(', '),
+          // Add some default values that might be needed
+          enrolled: 0,
+          capacity: 30,
+          status: 'available'
+        }));
+        
+        setAvailableCourses(transformedCourses);
+        setError(null);
+      } catch (error) {
+        setError('Failed to load courses. Please try again.');
+        console.error('Error loading courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCourses();
+  }, []);
 
   // Calculate total credits
   const totalCredits = selectedCourses.reduce((total, course) => total + course.credits, 0);
 
-  // Detect schedule conflicts
-  const detectConflicts = () => {
-    const newConflicts = [];
-    
-    for (let i = 0; i < selectedCourses.length; i++) {
-      for (let j = i + 1; j < selectedCourses.length; j++) {
-        const course1 = selectedCourses[i];
-        const course2 = selectedCourses[j];
-        
-        const hasConflict = course1.timeSlots.some(slot1 => 
-          course2.timeSlots.some(slot2 => 
-            slot1.day === slot2.day && timesOverlap(slot1, slot2)
-          )
-        );
-        
-        if (hasConflict) {
-          newConflicts.push({
-            course1: course1,
-            course2: course2,
-            type: 'time'
-          });
-        }
-      }
-    }
-    
-    setConflicts(newConflicts);
-  };
-
-  // Check if times overlap
-  const timesOverlap = (slot1, slot2) => {
-    const start1 = timeToMinutes(slot1.start);
-    const end1 = timeToMinutes(slot1.end);
-    const start2 = timeToMinutes(slot2.start);
-    const end2 = timeToMinutes(slot2.end);
-    
-    return (start1 < end2 && start2 < end1);
-  };
-
-  // Convert time to minutes
-  const timeToMinutes = (time) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
   // Select course function
   const selectCourse = (courseId) => {
-    const course = coursesData.find(c => c.id === courseId);
+    const course = availableCourses.find(c => c.id === courseId);
     if (!course || selectedCourses.some(selected => selected.id === courseId)) return;
 
-    const isFull = course.enrolled >= course.capacity;
     const courseWithStatus = {
       ...course,
-      status: isFull ? 'waitlist' : 'enrolled'
+      status: 'enrolled'
     };
 
     setSelectedCourses(prev => [...prev, courseWithStatus]);
-    
-    if (isFull) {
-      setWaitlistCourses(prev => [...prev, courseWithStatus]);
-    }
   };
 
   // Remove course function
   const removeCourse = (courseId) => {
     setSelectedCourses(prev => prev.filter(course => course.id !== courseId));
-    setWaitlistCourses(prev => prev.filter(course => course.id !== courseId));
   };
 
   // Navigation functions
   const goToStep = (step) => {
-    if (step === 2) {
-      detectConflicts();
-    }
     setCurrentStep(step);
   };
 
@@ -106,9 +99,24 @@ const Registration = () => {
   };
 
   return (
-        
-        <main className="flex-1 p-6">
+    <main className="flex-1 p-6">
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="text-blue-600">Loading courses...</div>
+        </div>
+      )}
 
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      {/* Main Content - only show when not loading */}
+      {!loading && !error && (
+        <>
           {/* Progress Steps */}
           <ProgressSteps currentStep={currentStep} />
 
@@ -118,7 +126,7 @@ const Registration = () => {
           {/* Step Content */}
           {currentStep === 1 && (
             <CourseSelection
-              availableCourses={coursesData}
+              availableCourses={availableCourses}
               selectedCourses={selectedCourses}
               onSelectCourse={selectCourse}
               onRemoveCourse={removeCourse}
@@ -131,7 +139,7 @@ const Registration = () => {
             <ReviewAndConflicts
               selectedCourses={selectedCourses}
               conflicts={conflicts}
-              waitlistCourses={waitlistCourses}
+              setConflicts={setConflicts}
               totalCredits={totalCredits}
               onBack={() => goToStep(1)}
               onNext={() => goToStep(3)}
@@ -146,7 +154,9 @@ const Registration = () => {
               onConfirm={confirmRegistration}
             />
           )}
-        </main>
+        </>
+      )}
+    </main>
   );
 };
 

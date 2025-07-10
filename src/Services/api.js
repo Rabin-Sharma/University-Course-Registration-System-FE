@@ -20,6 +20,43 @@ export async function request(url, method, data) {
 
   const res = await fetch("http://localhost:8000/api/" + url, options);
 
-
   return res;
 }
+
+// API function to fetch all available courses
+export const fetchCourses = async () => {
+  try {
+    const response = await request("courses", "GET");
+    if (!response.ok) {
+      throw new Error('Failed to fetch courses');
+    }
+    const data = await response.json();
+    
+    // Check if the response has the expected structure
+    if (!data.status || !data.courses) {
+      throw new Error('Invalid response format');
+    }
+    
+    return data.courses;
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    throw error;
+  }
+};
+
+// API function to check conflicts for selected courses
+export const checkConflicts = async (selectedCourseIds) => {
+  try {
+    const response = await request("courses/check-conflicts", "POST", {
+      courseIds: selectedCourseIds
+    });
+    if (!response.ok) {
+      throw new Error('Failed to check conflicts');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error checking conflicts:', error);
+    throw error;
+  }
+};

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import TopNavigation from './TopNavigation';
+// import TopNavigation from './TopNavigation';
 import Sidebar from './Sidebar';
-import Header from './Header';
 import ProgressSteps from './ProgressSteps';
 import CreditLimit from './CreditLimit';
 import CourseSelection from './CourseSelection';
@@ -107,15 +106,8 @@ const Registration = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <TopNavigation />
-      
-      <div className="flex">
-        <Sidebar currentPage="registration" />
         
         <main className="flex-1 p-6">
-          {/* Header */}
-          <Header />
 
           {/* Progress Steps */}
           <ProgressSteps currentStep={currentStep} />
@@ -155,10 +147,6 @@ const Registration = () => {
             />
           )}
         </main>
-      </div>
-
-      <MobileNavigation currentPage="registration" />
-    </div>
   );
 };
 

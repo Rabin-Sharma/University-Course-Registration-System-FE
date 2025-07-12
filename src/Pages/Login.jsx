@@ -6,12 +6,14 @@ import { request } from "../Services/api";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
+      setIsLoading(true);
       const res = await request("login", "POST", { email, password });
       const data = await res.json();
 
@@ -27,6 +29,8 @@ const Login = () => {
     } catch (error) {
       toast.error("An error occurred while logging in.");
       console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -115,7 +119,31 @@ const Login = () => {
             onClick={handleLogin}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 transform hover:scale-105"
           >
-            Sign In
+            {/* show a spinning circle for loader */}
+            {isLoading ? (
+              <svg
+                className="animate-spin h-5 w-5 mx-auto"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2.93 6.343A8.001 8.001 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3.93-1.595zM20.071 17.657A8.001 8.001 0 0120 12h4c0 3.042-1.135 5.824-3 7.938l-3.929-1.595zM12 20a8 8 0 008-8h4c0 4.411-3.589 8-8 8v-4zM12 4a8 8 0 00-8 8H0c0-4.411 3.589-8 8-8v4z"
+                ></path>
+              </svg>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 

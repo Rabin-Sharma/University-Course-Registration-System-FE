@@ -15,10 +15,10 @@ const ReviewAndConflicts = ({
   // Check conflicts when component mounts or selected courses change
   useEffect(() => {
     const checkForConflicts = async () => {
-      if (selectedCourses.length < 2) {
-        setConflicts([]);
-        return;
-      }
+      // if (selectedCourses.length < 2) {
+      //   setConflicts([]);
+      //   return;
+      // }
 
       try {
         setIsCheckingConflicts(true);
@@ -88,7 +88,7 @@ const ReviewAndConflicts = ({
       )}
 
       {/* Success Message when no conflicts */}
-      {conflicts.length === 0 && !isCheckingConflicts && selectedCourses.length > 1 && (
+      {conflicts.length === 0 && !isCheckingConflicts && !conflictError &&selectedCourses.length > 1 && (
         <div className="bg-green-50 border border-green-200 p-4 rounded-xl mb-6">
           <div className="flex items-start">
             <svg className="w-5 h-5 text-green-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

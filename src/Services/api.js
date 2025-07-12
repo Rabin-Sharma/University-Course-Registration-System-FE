@@ -54,6 +54,12 @@ export const checkConflicts = async (selectedCourseIds) => {
       throw new Error('Failed to check conflicts');
     }
     const data = await response.json();
+    
+    // Check if the response has the expected structure
+    if (!data.status) {
+      throw new Error('Invalid response format');
+    }
+    
     return data;
   } catch (error) {
     console.error('Error checking conflicts:', error);

@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 export async function request(url, method, data) {
   const token = localStorage.getItem("token"); // or sessionStorage, or another source
 
@@ -66,3 +68,27 @@ export const checkConflicts = async (selectedCourseIds) => {
     throw error;
   }
 };
+
+
+export const confirmRegistration = async (selectedCourseIds) => {
+  try {
+    const response = await request("courses/confirm-registration", "POST", {
+      courseIds: selectedCourseIds
+    });
+    if (!response.ok) {
+      toast.error('Failed to confirm registration');
+      throw new Error('Failed to confirm registration');
+    }
+    const data = await response.json();
+    
+    // Check if the response has the expected structure
+    if (!data.status) {
+      throw new Error('Invalid response format');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error confirming registration:', error);
+    throw error;
+  }
+}

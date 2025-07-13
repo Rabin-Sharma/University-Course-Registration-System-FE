@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { confirmRegistration } from '../../../Services/api';
+import toast from 'react-hot-toast';
 
 const Confirmation = ({ selectedCourses, totalCredits, onBack, onConfirm }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -6,14 +8,28 @@ const Confirmation = ({ selectedCourses, totalCredits, onBack, onConfirm }) => {
   const enrolledCourses = selectedCourses.filter(course => course.status !== 'waitlist');
   const waitlistedCourses = selectedCourses.filter(course => course.status === 'waitlist');
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     setIsProcessing(true);
-    
-    // Simulate processing time
-    setTimeout(() => {
-      onConfirm();
+
+    try {
+      const selectedId = selectedCourses.map(course => course.id);
+      const confirmationData = await confirmRegistration(selectedId);
+
+      
+      if (confirmationData.status) {
+        console.log('Registration confirmed:', confirmationData);
+        toast.success('Registration confirmed successfully!');
+        onConfirm();
+      } else {
+        toast.error('Failed to confirm registration. Please try again.');
+
+      }
+
+    } catch (error) {
+      console.error('Error confirming registration:', error);
+    } finally {
       setIsProcessing(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -43,14 +59,14 @@ const Confirmation = ({ selectedCourses, totalCredits, onBack, onConfirm }) => {
                 <span className="text-gray-600">Total Credits:</span>
                 <span className="font-medium ml-2">{totalCredits}</span>
               </div>
-              <div>
+              {/* <div>
                 <span className="text-gray-600">Enrolled:</span>
                 <span className="font-medium ml-2 text-green-600">{enrolledCourses.length}</span>
               </div>
               <div>
                 <span className="text-gray-600">Waitlisted:</span>
                 <span className="font-medium ml-2 text-yellow-600">{waitlistedCourses.length}</span>
-              </div>
+              </div> */}
             </div>
           </div>
           
@@ -68,7 +84,7 @@ const Confirmation = ({ selectedCourses, totalCredits, onBack, onConfirm }) => {
             </div>
           )}
           
-          {waitlistedCourses.length > 0 && (
+          {/* {waitlistedCourses.length > 0 && (
             <div className="mb-4">
               <h5 className="font-medium text-gray-800 mb-2">Waitlisted Courses</h5>
               <div className="space-y-2">
@@ -80,17 +96,17 @@ const Confirmation = ({ selectedCourses, totalCredits, onBack, onConfirm }) => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
-        <div className="bg-gray-50 p-4 rounded-lg">
+        {/* <div className="bg-gray-50 p-4 rounded-lg">
           <h4 className="font-medium text-gray-800 mb-2">Important Notes:</h4>
           <ul className="text-sm text-gray-600 space-y-1">
             <li>• Registration is binding once confirmed</li>
             <li>• Waitlisted courses will notify you if spots become available</li>
             <li>• Changes after registration may incur fees</li>
           </ul>
-        </div>
+        </div> */}
       </div>
 
       <div className="flex justify-between">

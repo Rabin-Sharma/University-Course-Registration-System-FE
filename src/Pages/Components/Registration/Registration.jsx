@@ -5,7 +5,7 @@ import CourseSelection from "./CourseSelection";
 import ReviewAndConflicts from "./ReviewAndConflicts";
 import Confirmation from "./Confirmation";
 import MobileNavigation from "./MobileNavigation";
-import { fetchCourses } from "../../../Services/api";
+import { fetchUnenrolledCourses } from "../../../Services/api";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +23,7 @@ const Registration = () => {
     const loadCourses = async () => {
       try {
         setLoading(true);
-        const coursesData = await fetchCourses();
+        const coursesData = await fetchUnenrolledCourses();
 
         // Transform the backend data to match frontend expectations
         const transformedCourses = coursesData.map((course) => ({

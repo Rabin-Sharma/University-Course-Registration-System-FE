@@ -2,23 +2,30 @@ import React, { useEffect, useState } from "react";
 import { fetchEnrolledCourses } from "../../Services/api";
 import toast from "react-hot-toast";
 
-const EnrolledCourse = () => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const getEnrolledCourses = async () => {
-    try {
-    const courseData = await fetchEnrolledCourses();
-    setCourses(courseData);
-    } catch (error) {
-      toast.error("Failed to fetch enrolled courses. Please try again.");
-      console.error("Error fetching enrolled courses:", error);
-    } finally {
-      setLoading(false);
+const EnrolledCourse = ({ courses, loading }) => {
+  // Simple function to show course schedule
+  const getSchedule = (timeStamps) => {
+    if (!timeStamps || timeStamps.length === 0) {
+      return "Time TBD";
     }
+
+    let schedule = "";
+    timeStamps.forEach((time, index) => {
+      const day = time.day.substring(0, 3); // Get first 3 letters: Monday -> Mon
+      const startTime = time.start_time.substring(0, 5); // Get time: 10:00:00 -> 10:00
+      const endTime = time.end_time.substring(0, 5); // Get time: 12:00:00 -> 12:00
+
+      schedule += `${day} ${startTime}-${endTime}`;
+
+      // Add comma if not the last item
+      if (index < timeStamps.length - 1) {
+        schedule += ", ";
+      }
+      
+    });
+
+    return schedule;
   };
-  useEffect(() =>{
-    getEnrolledCourses();
-  });
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -34,21 +41,27 @@ const EnrolledCourse = () => {
             <p className="text-gray-500 mt-2">Loading enrolled courses...</p>
           </div>
         )}
-        {courses.map((course) => (
-          <div key={course.id} className="p-6 flex justify-between items-center">
-            <div>
-              <h4 className="font-semibold text-gray-800">
-                {course.course_code} - {course.name}
-              </h4>
-              <p className="text-sm text-gray-600">
-                Dr. Smith • 3 Credits • Mon, Wed 10:00-11:30 AM
-              </p>
+        {courses.map((course) => {
+          return (
+            <div
+              key={course.id}
+              className="p-6 flex justify-between items-center"
+            >
+              <div>
+                <h4 className="font-semibold text-gray-800">
+                  {course.course_code} - {course.name}
+                </h4>
+                <p className="text-sm text-gray-600">
+                  {course.instructor.name} • {course.credits} Credits •{" "}
+                  {getSchedule(course.time_stamps)}
+                </p>
+              </div>
+              <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                Enrolled
+              </span>
             </div>
-            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-              Enrolled
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

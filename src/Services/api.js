@@ -61,7 +61,7 @@ export const fetchEnrolledCourses = async () => {
       throw new Error("Invalid response format");
     }
 
-    return data.courses;
+    return data;
   } catch (error) {
     console.error("Error fetching enrolled courses:", error);
     throw error;

@@ -114,3 +114,24 @@ export const confirmRegistration = async (selectedCourseIds) => {
     throw error;
   }
 };
+
+export const fetchRoutine = async () => {
+  try {
+    const response = await request("courses/routine", "GET");
+    if (!response.ok) {
+      throw new Error("Failed to fetch routine");
+    }
+    const data = await response.json();
+
+    // Check if the response has the expected structure
+    if (!data.status || !data.routine) {
+      toast.error("Invalid response format");
+      throw new Error("Invalid response format");
+    }
+
+    return data.routine;
+  } catch (error) {
+    console.error("Error fetching routine:", error);
+    throw error;
+  }
+};

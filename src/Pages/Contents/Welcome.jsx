@@ -1,12 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { CgSandClock } from "react-icons/cg";
 import { FaPlus } from "react-icons/fa";
 import { HiOutlineBookOpen } from "react-icons/hi";
 import { IoSearch, IoTrendingUp, IoWarningOutline } from "react-icons/io5";
 import { LuClock5 } from "react-icons/lu";
 import { MdAppRegistration, MdCalendarMonth } from "react-icons/md";
+import { Link } from "react-router-dom";
+import { fetchDashboardData } from "../../Services/api";
 
 const Welcome = () => {
+  const [dashboardCounts, setDashboardCounts] = useState(null);
+  const [isLoading, setLoading] = useState(true);
+
+  const getDashboardData = async () => {
+    setLoading(true);
+    try {
+      const dashboardData = await fetchDashboardData();
+      setDashboardCounts(dashboardData);
+    } catch (error) {
+      toast.error("Failed to fetch dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getDashboardData();
+  }, []);
+
   return (
     <main className="flex-1 p-6">
       {/* <!-- Welcome Section --> */}
@@ -28,7 +50,13 @@ const Welcome = () => {
               <p className="text-sm font-medium text-gray-600">
                 Registered Courses
               </p>
-              <p className="text-3xl font-bold text-blue-600">5</p>
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+              ) : (
+                <p className="text-3xl font-bold text-blue-600">
+                  {dashboardCounts.enrolledCount || 0}
+                </p>
+              )}
             </div>
             <div className="bg-blue-100 p-3 rounded-full">
               <HiOutlineBookOpen className="w-6 h-6 text-blue-600" />
@@ -43,7 +71,13 @@ const Welcome = () => {
               <p className="text-sm font-medium text-gray-600">
                 Schedule Conflicts
               </p>
-              <p className="text-3xl font-bold text-red-600">0</p>
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600 mx-auto mb-2"></div>
+              ) : (
+                <p className="text-3xl font-bold text-red-600">
+                  {dashboardCounts.conflictCount || 0}
+                </p>
+              )}
             </div>
             <div className="bg-orange-100 p-3 rounded-full">
               <IoWarningOutline className="w-6 h-6 text-orange-600" />
@@ -56,7 +90,13 @@ const Welcome = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Credit Hours</p>
-              <p className="text-3xl font-bold text-purple-600">15</p>
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mx-auto mb-2"></div>
+              ) : (
+                <p className="text-3xl font-bold text-purple-600">
+                  {dashboardCounts.credits || 0}
+                </p>
+              )}
             </div>
             <div className="bg-purple-100 p-3 rounded-full">
               <IoTrendingUp className="w-6 h-6 text-purple-600" />
@@ -69,8 +109,18 @@ const Welcome = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Next Class</p>
-              <p className="text-lg font-bold text-gray-800">CS 101</p>
-              <p className="text-sm text-gray-500">10:00 AM</p>
+              {isLoading ? (
+                <p className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mx-auto mb-2"></p>
+              ) : (
+                <>
+                  <p className="text-lg font-bold text-gray-800">
+                    {dashboardCounts.nextCourse.course_code}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {dashboardCounts.nextCourse.start_time}
+                  </p>
+                </>
+              )}
             </div>
             <div className="bg-green-100 p-3 rounded-full">
               <LuClock5 className="w-6 h-6 text-green-600" />
@@ -85,8 +135,8 @@ const Welcome = () => {
           Quick Actions
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a
-            href="courses.html"
+          <Link
+            to="../courses"
             className="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition duration-200 text-center"
           >
             <div className="mb-2">
@@ -94,10 +144,10 @@ const Welcome = () => {
             </div>
             <h4 className="font-semibold">Browse Courses</h4>
             <p className="text-sm opacity-90">Find and register for courses</p>
-          </a>
+          </Link>
 
-          <a
-            href="schedule.html"
+          <Link
+            to="../schedule"
             className="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition duration-200 text-center"
           >
             <div className="mb-2">
@@ -105,10 +155,10 @@ const Welcome = () => {
             </div>
             <h4 className="font-semibold">View Schedule</h4>
             <p className="text-sm opacity-90">Check your class timetable</p>
-          </a>
+          </Link>
 
-          <a
-            href="registration.html"
+          <Link
+            to="../registration"
             className="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 transition duration-200 text-center"
           >
             <div className="mb-2">
@@ -116,7 +166,7 @@ const Welcome = () => {
             </div>
             <h4 className="font-semibold">Manage Registration</h4>
             <p className="text-sm opacity-90">Review selected courses</p>
-          </a>
+          </Link>
         </div>
       </div>
 

@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { IoArrowBack, IoCalendar, IoTime, IoPerson, IoBook, IoDocument, IoSchool } from "react-icons/io5";
+import {
+  IoArrowBack,
+  IoCalendar,
+  IoTime,
+  IoPerson,
+  IoBook,
+  IoDocument,
+  IoSchool,
+} from "react-icons/io5";
 import toast from "react-hot-toast";
 import { fetchCourseDetails } from "../../Services/api";
 import { getStorageUrl } from "../../config/constants";
@@ -11,36 +19,35 @@ const CourseDetail = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const getCourseDetails = async () => {
+    try {
+      setLoading(true);
+      const courseData = await fetchCourseDetails(id);
+      setCourse(courseData);
+    } catch (error) {
+      toast.error("Failed to fetch course details");
+      console.error("Error fetching course details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const getCourseDetails = async () => {
-      try {
-        setLoading(true);
-        const courseData = await fetchCourseDetails(id);
-        setCourse(courseData);
-      } catch (error) {
-        toast.error("Failed to fetch course details");
-        console.error("Error fetching course details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (id) {
       getCourseDetails();
     }
   }, [id]);
 
   const formatTime = (time) => {
-    return new Date(`1970-01-01T${time}`).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+    return new Date(`1970-01-01T${time}`).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   };
 
   const groupTimeStampsByDay = (timeStamps) => {
     const grouped = {};
-    timeStamps.forEach(stamp => {
+    timeStamps.forEach((stamp) => {
       if (!grouped[stamp.day]) {
         grouped[stamp.day] = [];
       }
@@ -63,8 +70,12 @@ const CourseDetail = () => {
     return (
       <main className="flex-1 p-6">
         <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-700 mb-2">Course not found</h3>
-          <p className="text-gray-500 mb-4">The course you're looking for doesn't exist.</p>
+          <h3 className="text-lg font-medium text-gray-700 mb-2">
+            Course not found
+          </h3>
+          <p className="text-gray-500 mb-4">
+            The course you're looking for doesn't exist.
+          </p>
           <button
             onClick={() => navigate("/courses")}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
@@ -116,11 +127,17 @@ const CourseDetail = () => {
                     {course.credits} Credits
                   </span>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-3">{course.name}</h1>
-                <p className="text-gray-600 leading-relaxed">{course.description}</p>
+                <h1 className="text-2xl font-bold text-gray-800 mb-3">
+                  {course.name}
+                </h1>
+                <p className="text-gray-600 leading-relaxed">
+                  {course.description}
+                </p>
                 <div className="flex items-center mt-4 text-gray-600">
                   <IoTime className="w-4 h-4 mr-2" />
-                  <span className="text-sm">Duration: {course.time_description}</span>
+                  <span className="text-sm">
+                    Duration: {course.time_description}
+                  </span>
                 </div>
               </div>
             </div>
@@ -140,7 +157,8 @@ const CourseDetail = () => {
                     <div className="space-y-1">
                       {stamps.map((stamp) => (
                         <p key={stamp.id} className="text-gray-600 text-sm">
-                          {formatTime(stamp.start_time)} - {formatTime(stamp.end_time)}
+                          {formatTime(stamp.start_time)} -{" "}
+                          {formatTime(stamp.end_time)}
                         </p>
                       ))}
                     </div>
@@ -188,13 +206,21 @@ const CourseDetail = () => {
                   className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
                 />
               )}
-              <h4 className="font-medium text-gray-800 mb-1">{course.instructor.name}</h4>
-              <p className="text-gray-600 text-sm mb-2">{course.instructor.email}</p>
+              <h4 className="font-medium text-gray-800 mb-1">
+                {course.instructor.name}
+              </h4>
+              <p className="text-gray-600 text-sm mb-2">
+                {course.instructor.email}
+              </p>
               {course.instructor.phone && (
-                <p className="text-gray-600 text-sm mb-2">{course.instructor.phone}</p>
+                <p className="text-gray-600 text-sm mb-2">
+                  {course.instructor.phone}
+                </p>
               )}
               {course.instructor.address && (
-                <p className="text-gray-500 text-xs">{course.instructor.address}</p>
+                <p className="text-gray-500 text-xs">
+                  {course.instructor.address}
+                </p>
               )}
             </div>
           </div>
@@ -206,8 +232,12 @@ const CourseDetail = () => {
               Category
             </h3>
             <div>
-              <h4 className="font-medium text-gray-800 mb-2">{course.category.name}</h4>
-              <p className="text-gray-600 text-sm">{course.category.description}</p>
+              <h4 className="font-medium text-gray-800 mb-2">
+                {course.category.name}
+              </h4>
+              <p className="text-gray-600 text-sm">
+                {course.category.description}
+              </p>
             </div>
           </div>
 

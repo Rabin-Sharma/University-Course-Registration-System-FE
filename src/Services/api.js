@@ -47,6 +47,28 @@ export const fetchUnenrolledCourses = async () => {
   }
 };
 
+//API function to fetch dashboard data
+export const fetchDashboardData = async () => {
+  try {
+    const response = await request("dashboard/counts", "GET");
+    if (!response.ok) {
+      throw new Error("Failed to fetch dashboard data");
+    }
+    const data = await response.json();
+
+    // Check if the response has the expected structure
+    if (!data.status) {
+      toast.error("Invalid response format");
+      throw new Error("Invalid response format");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    throw error;
+  }
+};
+
 //API function to fetch all enrolled courses
 export const fetchEnrolledCourses = async () => {
   try {
@@ -145,7 +167,7 @@ export const fetchCourseDetails = async (courseId) => {
     }
     const data = await response.json();
 
-    if(!data.status) {
+    if (!data.status) {
       toast.error(data.message || "Failed to fetch course details");
       throw new Error("Failed to fetch course details");
     }

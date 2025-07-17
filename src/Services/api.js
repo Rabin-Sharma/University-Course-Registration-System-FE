@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import { API_CONFIG } from "../config/constants";
 
 export async function request(url, method, data) {
   const token = localStorage.getItem("token"); // or sessionStorage, or another source
@@ -20,7 +21,7 @@ export async function request(url, method, data) {
     url += `?${params}`;
   }
 
-  const res = await fetch("http://localhost:8000/api/" + url, options);
+  const res = await fetch(`${API_CONFIG.API_BASE_URL}/${url}`, options);
 
   return res;
 }
@@ -132,6 +133,32 @@ export const fetchRoutine = async () => {
     return data.routine;
   } catch (error) {
     console.error("Error fetching routine:", error);
+    throw error;
+  }
+};
+
+export const fetchCourseDetails = async (courseId) => {
+  try {
+    const response = await request(`courses/${courseId}`, "GET");
+    if (!response.ok) {
+      throw new Error("Failed to fetch course details");
+    }
+    const data = await response.json();
+
+    if(!data.status) {
+      toast.error(data.message || "Failed to fetch course details");
+      throw new Error("Failed to fetch course details");
+    }
+
+    // Check if the response has the expected structure
+    if (!data.course) {
+      toast.error("Invalid response format");
+      throw new Error("Invalid response format");
+    }
+
+    return data.course;
+  } catch (error) {
+    console.error("Error fetching course details:", error);
     throw error;
   }
 };

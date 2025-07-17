@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Welcome from "./Pages/Contents/Welcome";
 import DashboardLayout from "./Pages/Layouts/DashboardLayout";
 import Courses from "./Pages/Contents/Courses";
+import CourseDetail from "./Pages/Contents/CourseDetail";
 import Login from "./Pages/Login";
 import ProtectedRoute from "./Hooks/ProtectedRoute";
 import Schedule from "./Pages/Contents/Schedule";
@@ -27,6 +28,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Courses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses/:id"
+          element={
+            <ProtectedRoute>
+              <CourseDetail />
             </ProtectedRoute>
           }
         />

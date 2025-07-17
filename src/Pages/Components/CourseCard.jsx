@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaRegUser } from "react-icons/fa";
 import { HiOutlineOfficeBuilding } from "react-icons/hi";
 import { LuClock5 } from "react-icons/lu";
@@ -36,9 +37,12 @@ const CourseCard = ({course}) => {
           </div>
         </div>
 
-        <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200">
-          Register
-        </button>
+        <Link
+          to={`/courses/${course.id}`}
+          className="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 text-center"
+        >
+          View Details
+        </Link>
       </div>
     </>
   );

@@ -108,13 +108,15 @@ const WeeklyTimeTable = () => {
               Object.entries(routine)
                 .filter(([hour, dayData]) => {
                   // Check if any day in this hour has a course
+                  // Returns true if any of day in current hour has course
                   return Object.values(dayData).some(course => course && !Array.isArray(course));
                 })
                 .map(([hour, dayData]) => (
                 <tr key={hour}>
                   <td className="px-4 py-4 text-sm text-gray-500 font-medium"> {hour}:00 </td>
                   {Object.entries(dayData).map(([day, course], index) => (
-                    <td key={index} className={`px-4 py-4 ${ isCurrentDay(day) ? "bg-blue-50" : "" }`} >
+
+                    <td title={course.course_name} key={index} className={`px-4 py-4 ${ isCurrentDay(day) ? "bg-blue-50" : "" }`} >
 
                       {course && !Array.isArray(course) ? (
                         <div className="bg-indigo-100 text-indigo-800 p-2 rounded-lg text-sm">

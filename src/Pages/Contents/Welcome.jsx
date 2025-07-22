@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { CgSandClock } from "react-icons/cg";
-import { FaPlus } from "react-icons/fa";
 import { HiOutlineBookOpen } from "react-icons/hi";
 import { IoSearch, IoTrendingUp, IoWarningOutline } from "react-icons/io5";
 import { LuClock5 } from "react-icons/lu";
 import { MdAppRegistration, MdCalendarMonth } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { fetchDashboardData } from "../../Services/api";
+import RecentActivity from "../Components/RecentActivity";
 
 const Welcome = () => {
   const [dashboardCounts, setDashboardCounts] = useState(null);
@@ -170,36 +169,7 @@ const Welcome = () => {
         </div>
       </div>
 
-      {/* <!-- Recent Activity --> */}
-      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">
-          Recent Activity
-        </h3>
-        <div className="space-y-4">
-          <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-            <div className="bg-blue-100 p-2 rounded-full mr-3">
-              <CgSandClock className="w-4 h-4 text-blue-600" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-800">
-                Registered for CS 301 - Data Structures
-              </p>
-              <p className="text-sm text-gray-500">2 hours ago</p>
-            </div>
-          </div>
-          <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-            <div className="bg-blue-100 p-2 rounded-full mr-3">
-              <CgSandClock className="w-4 h-4 text-blue-600" />
-            </div>
-            <div>
-              <p className="font-medium text-gray-800">
-                Schedule updated successfully
-              </p>
-              <p className="text-sm text-gray-500">Yesterday</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RecentActivity />
     </main>
   );
 };

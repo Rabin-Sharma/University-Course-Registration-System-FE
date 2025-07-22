@@ -47,6 +47,27 @@ export const fetchUnenrolledCourses = async () => {
   }
 };
 
+export const fetchRecentActivity = async () => {
+  try {
+    const response = await request("activities", "GET");
+    if (!response.ok) {
+      throw new Error("Failed to fetch recent activity");
+    }
+    const data = await response.json();
+
+    // Check if the response has the expected structure
+    if (!data.status) {
+      toast.error("Invalid response format");
+      throw new Error("Invalid response format");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching recent activity:", error);
+    throw error;
+  }
+};
+
 //API function to fetch dashboard data
 export const fetchDashboardData = async () => {
   try {
